@@ -2,7 +2,9 @@
 // Licensed under GPLv2+
 // Refer to the license.txt file included.
 
+#include <algorithm>
 #include <fstream>
+#include <iomanip>
 #include <iterator>
 #include <memory>
 #include <sstream>
@@ -78,7 +80,7 @@ void MemoryWatcher::ParseLine(const std::string& line)
     return;
   }
 
-  if (std::count( line.begin(), line.end(), ' ' ) == 3)
+  if (std::count(line.begin(), line.end(), ' ') == 3)
   {
     // This is a linked list line
     //  First, split the string into its parts
@@ -132,7 +134,11 @@ u32 MemoryWatcher::ChasePointer(const std::string& line)
 {
   u32 value = 0;
   for (u32 offset : m_addresses[line])
-    value = Memory::Read_U32(value + offset);
+  {
+    value = Common::swap32(value);
+    if (!Memory::CopyFromEmu(&value, value + offset, sizeof(value), false))
+      return 0;
+  }
   return value;
 }
 
@@ -174,8 +180,7 @@ bool MemoryWatcher::ChaseLinkedList(const std::string& address, LinkedList& llis
     // Read a blob at the data pointer address. This is the actual data we care about
     // Read the next element in the list
     LinkedList::Blob chunk(llist.m_data_struct_len);
-    if (!Memory::CopyFromEmu(chunk.data(), data_pointer, llist.m_data_struct_len,
-        false))
+    if (!Memory::CopyFromEmu(chunk.data(), data_pointer, llist.m_data_struct_len, false))
     {
       // If we get an error here, interpret it as a NULL pointer and just quit
       // When we first boot up, this memory will be uninitialized and contain
@@ -199,7 +204,8 @@ bool MemoryWatcher::ChaseLinkedList(const std::string& address, LinkedList& llis
     data.push_back(std::move(chunk));
 
     // Follow the pointer to the location of the next object
-    if (!Memory::CopyFromEmu(&pointer, pointer + llist.m_pointer_offset, sizeof(data_pointer)), false)
+    if (!Memory::CopyFromEmu(&pointer, pointer + llist.m_pointer_offset, sizeof(data_pointer)),
+        false)
     {
       break;
     }
@@ -209,7 +215,7 @@ bool MemoryWatcher::ChaseLinkedList(const std::string& address, LinkedList& llis
 
   if (changed)
   {
-    llist.m_data = std::move(data);;
+    llist.m_data = std::move(data);
   }
   return changed;
 }
