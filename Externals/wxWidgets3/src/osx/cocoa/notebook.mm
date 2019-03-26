@@ -258,13 +258,13 @@ public:
     int TabHitTest(const wxPoint & pt, long* flags) wxOVERRIDE
     {
         int retval = wxNOT_FOUND;
-        
+
         NSPoint nspt = wxToNSPoint( m_osxView, pt );
-        
+
         wxNSTabView* slf = (wxNSTabView*) m_osxView;
-        
+
         NSTabViewItem* hitItem = [slf tabViewItemAtPoint:nspt];
-        
+
         if (!hitItem) {
             if ( flags )
                 *flags = wxBK_HITTEST_NOWHERE;
@@ -273,13 +273,13 @@ public:
             if ( flags )
                 *flags = wxBK_HITTEST_ONLABEL;
         }
-        
-        return retval; 
+
+        return retval;
     }
 };
 
 
-/*
+
 #if 0
     Rect bounds = wxMacGetBoundsForControl( this, pos, size );
 
@@ -316,9 +316,9 @@ public:
     OSStatus err = CreateTabsControl(
         MAC_WXHWND(parent->MacGetTopLevelWindowRef()), &bounds,
         tabsize, tabstyle, 0, NULL, GetPeer()->GetControlRefAddr() );
-    verify_noerr( err );
+    // verify_noerr( err );
 #endif
-*/
+
 wxWidgetImplType* wxWidgetImpl::CreateTabView( wxWindowMac* wxpeer,
                                     wxWindowMac* WXUNUSED(parent),
                                     wxWindowID WXUNUSED(id),

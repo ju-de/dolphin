@@ -328,7 +328,7 @@ bool wxIcon::LoadIconFromSystemResource(const wxString& resourceName, int desire
     if ( theId != 0 )
     {
         IconRef iconRef = NULL ;
-        verify_noerr( GetIconRef( kOnSystemDisk, kSystemIconsCreator, theId, &iconRef ) ) ;
+        // verify_noerr( GetIconRef( kOnSystemDisk, kSystemIconsCreator, theId, &iconRef ) ) ;
         if ( iconRef )
         {
             m_refData = new wxIconRefData( (WXHICON) iconRef, desiredWidth, desiredHeight ) ;
@@ -373,7 +373,7 @@ bool wxIcon::LoadIconFromBundleResource(const wxString& resourceName, int desire
     {
         wxCFStringRef name(resourceName);
         FSRef iconFSRef;
-        
+
         wxCFRef<CFURLRef> iconURL(CFBundleCopyResourceURL(CFBundleGetMainBundle(), name, CFSTR("icns"), NULL));
 
         if (CFURLGetFSRef(iconURL, &iconFSRef))
@@ -381,7 +381,7 @@ bool wxIcon::LoadIconFromBundleResource(const wxString& resourceName, int desire
             // Get a handle on the icon family
             IconFamilyHandle iconFamily;
             OSStatus err = ReadIconFromFSRef( &iconFSRef, &iconFamily );
-            
+
             if ( err == noErr )
             {
                 err = GetIconRefFromIconFamilyPtr( *iconFamily, GetHandleSize((Handle) iconFamily), &iconRef );
@@ -488,7 +488,7 @@ void wxIcon::CopyFromBitmap( const wxBitmap& bmp )
     UnRef() ;
 
     // as the bitmap owns that ref, we have to acquire it as well
-    
+
     int w = bmp.GetWidth() ;
     int h = bmp.GetHeight() ;
     int sz = wxMax( w , h ) ;
@@ -498,7 +498,7 @@ void wxIcon::CopyFromBitmap( const wxBitmap& bmp )
         wxBitmap scaleBmp( bmp.ConvertToImage().Scale( w * 2 , h * 2 ) ) ;
         m_refData = new wxIconRefData( (WXHICON) scaleBmp.CreateIconRef(), bmp.GetWidth(), bmp.GetHeight()  ) ;
     }
-    else 
+    else
     {
         m_refData = new wxIconRefData( (WXHICON) bmp.CreateIconRef() , bmp.GetWidth(), bmp.GetHeight()  ) ;
     }
